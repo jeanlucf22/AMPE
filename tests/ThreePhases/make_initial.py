@@ -30,6 +30,10 @@ parser.add_option( "-z", "--nz", type="int",
                    help="number of cells in z direction" )
 parser.add_option( "--solid-fraction", type="float", default=1./60.,
                   help="solid-fraction at bottom")
+parser.add_option( "--concL", type="float", help="conc en phase L")
+parser.add_option( "--concA", type="float", help="conc en phase A")
+parser.add_option( "--concB", type="float", help="conc en phase B")
+
 parser.add_option( "--plane", type="int", default=1,
                   help="direction orthogonal to plane")
 
@@ -44,6 +48,10 @@ ny = options.ny
 nz = options.nz
 
 nn=[nx,ny,nz]
+
+cl = options.concL
+ca = options.concA
+cb = options.concB
 
 print(nn)
 dir0=0
@@ -79,6 +87,9 @@ ncphase.append( f.createVariable( 'phase2', 'f', ('z','y','x') ))
 
 phase = N.zeros( (3, nn[2],nn[1],nn[0]), N.float32 )
 
+ncconc = f.createVariable( 'concentration', 'f', ('z','y','x') )
+conc = N.zeros( (nn[2],nn[1],nn[0]), N.float32 )
+
 #-----------------------------------------------------------------------
 
 # Fill data arrays
@@ -102,10 +113,13 @@ for j in range( nn[dir1] ) :
       if( d0<0. ):
         if i<nn[dir0]/2:
           phase[1,index[2],index[1],index[0]] = 1.
+          conc[index[2],index[1],index[0]] = ca
         else:
           phase[2,index[2],index[1],index[0]] = 1.
+          conc[index[2],index[1],index[0]] = cb
       else:
         phase[0,index[2],index[1],index[0]] = 1.
+        conc[index[2],index[1],index[0]] = cl
 
 #-----------------------------------------------------------------------
 # Write data to file and close
@@ -113,5 +127,6 @@ for j in range( nn[dir1] ) :
 print("Write data to file")
 for m in range(3):
   ncphase[m][:,:,:]=phase[m,:,:,:]
+ncconc[:,:,:]=conc
 
 f.close()

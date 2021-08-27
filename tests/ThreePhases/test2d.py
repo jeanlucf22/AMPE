@@ -8,6 +8,7 @@ print("Test ThreePhases...")
 #prepare initial conditions file
 subprocess.call(["python3", "../../tests/ThreePhases/make_initial.py", "-d", "2",
   "-x", "64", "-y", "64", "-z", "1", "--solid-fraction", "0.5",
+  "--concL", "0.85", "--concA", "0.97", "--concB", "0.67",
   "test.nc"])
 
 mpicmd = sys.argv[1]+" "+sys.argv[2]+" "+sys.argv[3]

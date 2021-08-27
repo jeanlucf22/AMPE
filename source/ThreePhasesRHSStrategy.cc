@@ -147,6 +147,8 @@ void ThreePhasesRHSStrategy::evaluateRHS(const double time,
                                          const int ydot_phase_id,
                                          const bool eval_flag)
 {
+   assert(d_free_energy_strategy);
+
    math::PatchCellDataOpsReal<double> mathops;
 
    d_free_energy_strategy->computeFreeEnergyLiquid(*patch,
@@ -227,11 +229,11 @@ void ThreePhasesRHSStrategy::evaluateRHS(const double time,
 #endif
 
    // then add component from chemical energy
-   // d_free_energy_strategy->addDrivingForce(time, *patch,
-   //                                        d_temperature_scratch_id,
-   //                                        d_phase_scratch_id, -1,
-   //                                        d_conc_scratch_id, d_f_l_id,
-   //                                        d_f_a_id, d_f_b_id, ydot_phase_id);
+   d_free_energy_strategy->addDrivingForce(time, *patch,
+                                           d_temperature_scratch_id,
+                                           d_phase_scratch_id, -1,
+                                           d_conc_scratch_id, d_f_l_id,
+                                           d_f_a_id, d_f_b_id, ydot_phase_id);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
    l2rhs = opc.L2Norm(phase_rhs, pbox);

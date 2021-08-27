@@ -22,9 +22,7 @@ ModelParameters {
    three_phases = TRUE
    
    Temperature{
-      meltingT = 921.12
-      temperature = 920.87
-      latent_heat = 9.5e3 // [J/mol*K]
+      temperature = 773.
    }
    
    epsilon_phi = 1.77669990185572 // sqrt(6.*delta*L*Gamma/Tm)
@@ -36,14 +34,35 @@ ModelParameters {
 
    phi_interp_func_type ="h"
 
-   FreeEnergyModel{   
-      type = "linear"
+   ConcentrationModel {
+      model    = "calphad"
+      rhs_form = "ebs"
+      molar_volume = 1.095e-5
+      Calphad {
+         filename ="calphadAlCuLFccTheta.json"
+      }
+      NewtonSolver {
+        max_its = 50
+      }
+      diffusion_type = "temperature_dependent"
+      D_solid_A  =  3.e-1 //um**2/s
+      D_solid_B  =  3.e-1 //um**2/s
+      D_liquid  = 3.e3  //um**2/s
+      Q0_solid_A  = 0.    // [J/mol]
+      Q0_solid_B  = 0.    // [J/mol]
+      Q0_liquid = 0.    // [J/mol]
    }
 
    molar_volume = 1.e-5 // [m^3/mol]
 
    BoundaryConditions {
        Phase{
+         boundary_0 = "slope", "0"
+         boundary_1 = "slope", "0"
+         boundary_2 = "slope", "0"
+         boundary_3 = "slope", "0"
+      }
+      Conc{
          boundary_0 = "slope", "0"
          boundary_1 = "slope", "0"
          boundary_2 = "slope", "0"

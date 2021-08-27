@@ -321,10 +321,6 @@ void QuatModel::initializeRHSandEnergyStrategies(
          tbox::pout << "QuatModel: "
                     << "Using CALPHAD model for concentration" << std::endl;
          d_calphad_db = d_conc_db->getDatabase("Calphad");
-         std::string calphad_filename = d_calphad_db->getString("filename");
-         calphad_db.reset(new tbox::MemoryDatabase("calphad_db"));
-         tbox::InputManager::getManager()->parseInputFile(calphad_filename,
-                                                          calphad_db);
       }
    }
 
@@ -364,6 +360,10 @@ void QuatModel::initializeRHSandEnergyStrategies(
       if (d_model_parameters.isConcentrationModelCALPHAD()) {
 
 #ifndef HAVE_THERMO4PFM
+         std::string calphad_filename = d_calphad_db->getString("filename");
+         calphad_db.reset(new tbox::MemoryDatabase("calphad_db"));
+         tbox::InputManager::getManager()->parseInputFile(calphad_filename,
+                                                          calphad_db);
          if (calphad_db->keyExists("PenaltyPhaseL")) {
             tbox::plog << "QuatModel: "
                        << "Adding penalty to CALPHAD energy" << std::endl;

@@ -1,14 +1,31 @@
+// Copyright (c) 2018, Lawrence Livermore National Security, LLC and
+// UT-Battelle, LLC.
+// Produced at the Lawrence Livermore National Laboratory and
+// the Oak Ridge National Laboratory
+// Written by M.R. Dorr, J.-L. Fattebert and M.E. Wickett
+// LLNL-CODE-747500
+// All rights reserved.
+// This file is part of AMPE.
+// For details, see https://github.com/LLNL/AMPE
+// Please also read AMPE/LICENSE.
+//
 #ifndef included_FreeEnergyStrategyFactory
 #define included_FreeEnergyStrategyFactory
 
 #include "CALPHADFreeEnergyStrategyBinary.h"
 #include "CALPHADFreeEnergyStrategyTernary.h"
 #include "CALPHADFreeEnergyStrategyWithPenalty.h"
+#include "CALPHADFreeEnergyStrategyBinaryThreePhase.h"
 #include "KKSdiluteBinary.h"
 #include "HBSMFreeEnergyStrategy.h"
 #include "BiasDoubleWellBeckermannFreeEnergyStrategy.h"
 #include "BiasDoubleWellUTRCFreeEnergyStrategy.h"
 #include "DeltaTemperatureFreeEnergyStrategy.h"
+
+#ifdef HAVE_THERMO4PFM
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#endif
 
 class FreeEnergyStrategyFactory
 {
@@ -26,28 +43,52 @@ class FreeEnergyStrategyFactory
 
          if (model_parameters.isConcentrationModelCALPHAD()) {
             std::shared_ptr<tbox::MemoryDatabase> calphad_db;
+            boost::property_tree::ptree calphad_pt;
             std::shared_ptr<tbox::MemoryDatabase> newton_db;
 
             tbox::pout << "QuatModel: "
                        << "Using CALPHAD model for concentration" << std::endl;
             std::shared_ptr<tbox::Database> db(conc_db->getDatabase("Calphad"));
             std::string calphad_filename = db->getString("filename");
-            calphad_db.reset(new tbox::MemoryDatabase("calphad_db"));
-            tbox::InputManager::getManager()->parseInputFile(calphad_filename,
-                                                             calphad_db);
-
+            bool calphad_file_is_json = false;
+            if (calphad_filename.compare(calphad_filename.size() - 4, 4,
+                                         "json") == 0) {
+               boost::property_tree::read_json(calphad_filename, calphad_pt);
+               calphad_file_is_json = true;
+            } else {
+               calphad_db.reset(new tbox::MemoryDatabase("calphad_db"));
+               tbox::pout << "FreeEnergyStrategyFactory: Read "
+                          << calphad_filename << std::endl;
+               tbox::InputManager::getManager()->parseInputFile(
+                   calphad_filename, calphad_db);
+            }
             if (conc_db->isDatabase("NewtonSolver")) {
                db = conc_db->getDatabase("NewtonSolver");
                newton_db.reset(new tbox::MemoryDatabase("newton_db"));
             }
 
             if (ncompositions == 1) {
-               free_energy_strategy.reset(new CALPHADFreeEnergyStrategyBinary(
-                   calphad_db, newton_db,
-                   model_parameters.energy_interp_func_type(),
-                   model_parameters.conc_interp_func_type(), mvstrategy,
-                   conc_l_scratch_id, conc_a_scratch_id, conc_b_scratch_id,
-                   model_parameters.with_third_phase()));
+#ifdef HAVE_THERMO4PFM
+               if (conc_b_scratch_id >= 0) {
+                  tbox::pout << "Use CALPHADFreeEnergyStrategyBinaryThreePhase"
+                             << std::endl;
+                  free_energy_strategy.reset(
+                      new CALPHADFreeEnergyStrategyBinaryThreePhase(
+                          calphad_pt, newton_db,
+                          model_parameters.energy_interp_func_type(),
+                          model_parameters.conc_interp_func_type(), mvstrategy,
+                          conc_l_scratch_id, conc_a_scratch_id,
+                          conc_b_scratch_id));
+               } else
+#endif
+                  free_energy_strategy.reset(
+                      new CALPHADFreeEnergyStrategyBinary(
+                          calphad_db, newton_db,
+                          model_parameters.energy_interp_func_type(),
+                          model_parameters.conc_interp_func_type(), mvstrategy,
+                          conc_l_scratch_id, conc_a_scratch_id,
+                          conc_b_scratch_id,
+                          model_parameters.with_third_phase()));
             } else {
                assert(ncompositions == 2);
                free_energy_strategy.reset(new CALPHADFreeEnergyStrategyTernary(
@@ -56,24 +97,26 @@ class FreeEnergyStrategyFactory
                    model_parameters.conc_interp_func_type(), mvstrategy,
                    conc_l_scratch_id, conc_a_scratch_id));
             }
-            if (!calphad_db->keyExists("PenaltyPhaseL")) {
+            if (!calphad_file_is_json)
+               if (!calphad_db->keyExists("PenaltyPhaseL")) {
 
 #ifndef HAVE_THERMO4PFM
-            } else {
-               tbox::plog << "QuatModel: "
-                          << "Adding penalty to CALPHAD energy" << std::endl;
+               } else {
+                  tbox::plog << "QuatModel: "
+                             << "Adding penalty to CALPHAD energy" << std::endl;
 
-               assert(ncompositions == 1);
+                  assert(ncompositions == 1);
 
-               free_energy_strategy.reset(
-                   new CALPHADFreeEnergyStrategyWithPenalty(
-                       calphad_db, newton_db,
-                       model_parameters.energy_interp_func_type(),
-                       model_parameters.conc_interp_func_type(), mvstrategy,
-                       conc_l_scratch_id, conc_a_scratch_id, conc_b_scratch_id,
-                       ncompositions, model_parameters.with_third_phase()));
+                  free_energy_strategy.reset(
+                      new CALPHADFreeEnergyStrategyWithPenalty(
+                          calphad_db, newton_db,
+                          model_parameters.energy_interp_func_type(),
+                          model_parameters.conc_interp_func_type(), mvstrategy,
+                          conc_l_scratch_id, conc_a_scratch_id,
+                          conc_b_scratch_id, ncompositions,
+                          model_parameters.with_third_phase()));
 #endif
-            }
+               }
          }
 
          else if (model_parameters.isConcentrationModelKKSdilute()) {
