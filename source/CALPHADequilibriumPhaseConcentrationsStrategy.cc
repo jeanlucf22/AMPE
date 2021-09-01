@@ -172,6 +172,7 @@ void CALPHADequilibriumPhaseConcentrationsStrategy<FreeEnergyType>::
 #endif
 
    const int nphases = cd_pf->getDepth();
+   if (nphases == 3) assert(cd_cb);
 
    std::shared_ptr<pdat::CellData<double> > cd_cl_ref(
        SAMRAI_SHARED_PTR_CAST<pdat::CellData<double>, hier::PatchData>(
@@ -186,7 +187,7 @@ void CALPHADequilibriumPhaseConcentrationsStrategy<FreeEnergyType>::
    assert(cd_conc->getDepth() == cd_ca_ref->getDepth());
 
    std::shared_ptr<pdat::CellData<double> > cd_cb_ref;
-   if (d_with_third_phase) {
+   if (d_with_third_phase || nphases == 3) {
       cd_cb_ref =
           SAMRAI_SHARED_PTR_CAST<pdat::CellData<double>, hier::PatchData>(
               patch->getPatchData(d_conc_b_ref_id));
@@ -290,7 +291,7 @@ void CALPHADequilibriumPhaseConcentrationsStrategy<FreeEnergyType>::
             for (int ic = 0; ic < nc; ic++) {
                x[ic] = cd_cl_ref->getPointer(ic)[idx_ci];
                x[offset + ic] = cd_ca_ref->getPointer(ic)[idx_ci];
-               if (d_with_third_phase) {
+               if (d_with_third_phase || nphases == 3) {
                   x[2 * offset + ic] = cd_cb_ref->getPointer(ic)[idx_ci];
                }
             }
@@ -308,7 +309,7 @@ void CALPHADequilibriumPhaseConcentrationsStrategy<FreeEnergyType>::
             for (int ic = 0; ic < nc; ic++) {
                cd_cl->getPointer(ic)[idx_ci] = x[ic];
                cd_ca->getPointer(ic)[idx_ci] = x[offset + ic];
-               if (d_with_third_phase) {
+               if (d_with_third_phase || nphases == 3) {
                   cd_cb->getPointer(ic)[idx_ci] = x[2 * offset + ic];
                }
             }  // ic

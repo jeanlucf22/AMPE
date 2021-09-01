@@ -198,12 +198,6 @@ class CALPHADFreeEnergyStrategyBinaryThreePhase : public ConcFreeEnergyStrategy
    int d_conc_b_id;
 
  private:
-   double hprime(const double phi)
-   {
-      const char interp = energyInterpChar(d_energy_interp_func_type);
-      return DERIV_INTERP_FUNC(phi, &interp);
-   }
-
    void addDrivingForceOnPatch(
        std::shared_ptr<pdat::CellData<double> > cd_rhs,
        std::shared_ptr<pdat::CellData<double> > cd_temperature,
