@@ -17,7 +17,7 @@ namespace pt = boost::property_tree;
 #include "CALPHADequilibriumPhaseConcentrationsStrategy.h"
 #include "CALPHADFreeEnergyFunctionsBinary.h"
 #include "CALPHADFreeEnergyFunctionsTernary.h"
-#include "CALPHADFreeEnergyFunctionsBinaryThreePhase.h"
+#include "CALPHADFreeEnergyFunctionsBinary3Ph2Sl.h"
 
 #include "SAMRAI/math/PatchCellDataNormOpsReal.h"
 #include "SAMRAI/tbox/IEEE.h"
@@ -85,7 +85,7 @@ CALPHADequilibriumPhaseConcentrationsStrategy<
 
 template <>
 CALPHADequilibriumPhaseConcentrationsStrategy<
-    CALPHADFreeEnergyFunctionsBinaryThreePhase>::
+    CALPHADFreeEnergyFunctionsBinary3Ph2Sl>::
     CALPHADequilibriumPhaseConcentrationsStrategy(
         const int conc_l_scratch_id, const int conc_a_scratch_id,
         const int conc_b_scratch_id, const int conc_l_ref_id,
@@ -103,8 +103,8 @@ CALPHADequilibriumPhaseConcentrationsStrategy<
    pt::ptree newton_pt;
    if (newton_db) copyDatabase(newton_db, newton_pt);
    d_calphad_fenergy =
-       std::unique_ptr<CALPHADFreeEnergyFunctionsBinaryThreePhase>(
-           new CALPHADFreeEnergyFunctionsBinaryThreePhase(
+       std::unique_ptr<CALPHADFreeEnergyFunctionsBinary3Ph2Sl>(
+           new CALPHADFreeEnergyFunctionsBinary3Ph2Sl(
                calphad_pt, newton_pt, energy_interp_func_type,
                conc_interp_func_type));
 }
@@ -304,7 +304,8 @@ void CALPHADequilibriumPhaseConcentrationsStrategy<FreeEnergyType>::
                                                           phi[0], eta,
 #endif
                                                           x);
-
+            // std::cout<<"phi="<<phi[0]<<","<<phi[1]<<","<<phi[2]<<",
+            // x="<<x[0]<<","<<x[1]<<","<<x[2]<<std::endl;
             // set cell values with cL and cS just computed
             for (int ic = 0; ic < nc; ic++) {
                cd_cl->getPointer(ic)[idx_ci] = x[ic];

@@ -11,14 +11,8 @@
 //
 #ifdef HAVE_THERMO4PFM
 
-#include "ConcFort.h"
-#include "QuatParams.h"
 #include "CALPHADFreeEnergyStrategyBinaryThreePhase.h"
-#include "CALPHADFunctions.h"
 #include "MolarVolumeStrategy.h"
-#include "CALPHADFreeEnergyFunctionsBinary.h"
-#include "CALPHADFreeEnergyFunctionsTernary.h"
-#include "FuncFort.h"
 #include "interpolation.h"
 
 #include "Database2JSON.h"
@@ -26,12 +20,10 @@ namespace pt = boost::property_tree;
 
 #include "SAMRAI/tbox/InputManager.h"
 #include "SAMRAI/pdat/CellData.h"
-#include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/hier/Index.h"
 #include "SAMRAI/math/HierarchyCellDataOpsReal.h"
 
 using namespace SAMRAI;
-
 
 #include <cassert>
 
@@ -76,7 +68,7 @@ void CALPHADFreeEnergyStrategyBinaryThreePhase::setup(
    pt::ptree newton_pt;
    copyDatabase(newton_db, newton_pt);
    d_calphad_fenergy =
-       new CALPHADFreeEnergyFunctionsBinaryThreePhase(calphad_pt, newton_pt,
+       new CALPHADFreeEnergyFunctionsBinary3Ph2Sl(calphad_pt, newton_pt,
                                                       d_energy_interp_func_type,
                                                       d_conc_interp_func_type);
 }
@@ -687,6 +679,9 @@ void CALPHADFreeEnergyStrategyBinaryThreePhase::addDrivingForceOnPatch(
 
             double t = ptr_temp[idx_temp];
             double mu = computeMuA(t, ca);
+double muL=computeMuL(t, cl);
+if(fabs(mu-muL)>1.e-5)
+std::cout<<"mu="<<mu<<", muL="<<muL<<std::endl;
 
             ptr_rhs0[idx_rhs] += dg0dp0(phi0, phi1, phi2) * (fl - mu * cl) +
                                  dg0dp1(phi1, phi0, phi2) * (fa - mu * ca) +

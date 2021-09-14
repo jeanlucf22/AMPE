@@ -17,7 +17,7 @@
 #include "HBSMequilibriumPhaseConcentrationsStrategy.h"
 #include "PartitionPhaseConcentrationsStrategy.h"
 #include "PhaseIndependentConcentrationsStrategy.h"
-#include "CALPHADFreeEnergyFunctionsBinaryThreePhase.h"
+#include "CALPHADFreeEnergyFunctionsBinary3Ph2Sl.h"
 
 class PhaseConcentrationsStrategyFactory
 {
@@ -55,7 +55,7 @@ class PhaseConcentrationsStrategyFactory
                if (conc_b_scratch_id >= 0) {
                   phase_conc_strategy.reset(
                       new CALPHADequilibriumPhaseConcentrationsStrategy<
-                          CALPHADFreeEnergyFunctionsBinaryThreePhase>(
+                          CALPHADFreeEnergyFunctionsBinary3Ph2Sl>(
                           conc_l_scratch_id, conc_a_scratch_id,
                           conc_b_scratch_id, conc_l_ref_id, conc_a_ref_id,
                           conc_b_ref_id,

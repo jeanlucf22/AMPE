@@ -15,14 +15,9 @@
 #ifdef HAVE_THERMO4PFM
 
 #include "ConcFreeEnergyStrategy.h"
-#include "CALPHADSpeciesPhaseGibbsEnergy.h"
-#include "CALPHADConcSolverBinary.h"
-#include "FreeEnergyStrategy.h"
-#include "CALPHADFreeEnergyFunctionsBinaryThreePhase.h"
-#include "FuncFort.h"
+#include "CALPHADFreeEnergyFunctionsBinary3Ph2Sl.h"
 
 #include "SAMRAI/pdat/CellData.h"
-#include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/hier/Box.h"
 class MolarVolumeStrategy;
@@ -184,7 +179,7 @@ class CALPHADFreeEnergyStrategyBinaryThreePhase : public ConcFreeEnergyStrategy
 
    MolarVolumeStrategy* d_mv_strategy;
 
-   CALPHADFreeEnergyFunctionsBinaryThreePhase* d_calphad_fenergy;
+   CALPHADFreeEnergyFunctionsBinary3Ph2Sl* d_calphad_fenergy;
 
    EnergyInterpolationType d_energy_interp_func_type;
    ConcInterpolationType d_conc_interp_func_type;
