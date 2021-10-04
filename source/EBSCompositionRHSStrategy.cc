@@ -238,8 +238,7 @@ void EBSCompositionRHSStrategy::computeFluxOnPatch(hier::Patch& patch,
 #endif
                              flux->getGhostCellWidth()[0]);
 
-   if (d_with_third_phase) {
-      assert(d_conc_b_scratch_id >= 0);
+   if (d_conc_b_scratch_id) {
       std::shared_ptr<pdat::CellData<double> > conc_b(
           SAMRAI_SHARED_PTR_CAST<pdat::CellData<double>, hier::PatchData>(
               patch.getPatchData(d_conc_b_scratch_id)));
@@ -367,7 +366,7 @@ void EBSCompositionRHSStrategy::setDiffusionCoeffForPreconditionerOnPatch(
    double* ptr_dx_b = nullptr;
    double* ptr_dy_b = nullptr;
    double* ptr_dz_b = nullptr;
-   if (d_with_third_phase) {
+   if (sd_d_b) {
       ptr_dx_b = sd_d_b->getPointer(0, depth_in_Dmatrix);
       ptr_dy_b = sd_d_b->getPointer(1, depth_in_Dmatrix);
       if (NDIM > 2) ptr_dz_b = sd_d_b->getPointer(2, depth_in_Dmatrix);
@@ -412,7 +411,7 @@ void EBSCompositionRHSStrategy::setDiffusionCoeffForPreconditionerOnPatch(
             ptr_dx_coeff[idx_dcoeff] =
                 ptr_dx_l[idx_dcoeff] + ptr_dx_a[idx_dcoeff];
 
-            if (d_with_third_phase) {
+            if (sd_d_b) {
                ptr_dx_coeff[idx_dcoeff] += ptr_dx_b[idx_dcoeff];
             }
          }
@@ -432,7 +431,7 @@ void EBSCompositionRHSStrategy::setDiffusionCoeffForPreconditionerOnPatch(
             ptr_dy_coeff[idx_dcoeff] =
                 ptr_dy_l[idx_dcoeff] + ptr_dy_a[idx_dcoeff];
 
-            if (d_with_third_phase) {
+            if (sd_d_b) {
                ptr_dy_coeff[idx_dcoeff] += ptr_dy_b[idx_dcoeff];
             }
          }
@@ -454,7 +453,7 @@ void EBSCompositionRHSStrategy::setDiffusionCoeffForPreconditionerOnPatch(
                ptr_dz_coeff[idx_dcoeff] =
                    ptr_dz_l[idx_dcoeff] + ptr_dz_a[idx_dcoeff];
 
-               if (d_with_third_phase) {
+               if (sd_d_b) {
                   ptr_dz_coeff[idx_dcoeff] += ptr_dz_b[idx_dcoeff];
                }
             }
@@ -571,10 +570,12 @@ void EBSCompositionRHSStrategy::setDiffusionCoeffForT(
          assert(mq);
 
          std::shared_ptr<pdat::CellData<double> > eta;
-         if (d_with_third_phase) {
+         if (concentration_b_id >= 0) {
             cb =
                 SAMRAI_SHARED_PTR_CAST<pdat::CellData<double>, hier::PatchData>(
                     patch->getPatchData(concentration_b_id));
+         }
+         if (d_with_third_phase) {
             eta =
                 SAMRAI_SHARED_PTR_CAST<pdat::CellData<double>, hier::PatchData>(
                     patch->getPatchData(d_eta_scratch_id));
