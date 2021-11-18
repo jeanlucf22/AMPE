@@ -4090,6 +4090,28 @@ int QuatIntegrator::applyProjection(double time, SundialsAbstractVector* y,
       d_quat_sys_solver->applyProjection(q_id, corr_id, err_id);
    }
 
+   if (d_with_three_phases) {
+      std::shared_ptr<solv::SAMRAIVectorReal<double> > y_samvect =
+          Sundials_SAMRAIVector::getSAMRAIVector(y);
+      std::shared_ptr<solv::SAMRAIVectorReal<double> > corr_samvect =
+          Sundials_SAMRAIVector::getSAMRAIVector(corr);
+      std::shared_ptr<solv::SAMRAIVectorReal<double> > err_samvect =
+          Sundials_SAMRAIVector::getSAMRAIVector(err);
+
+      const int phi_id =
+          y_samvect->getComponentDescriptorIndex(d_phase_component_index);
+      const int corr_id =
+          corr_samvect->getComponentDescriptorIndex(d_phase_component_index);
+      const int err_id =
+          err_samvect->getComponentDescriptorIndex(d_phase_component_index);
+
+      std::shared_ptr<ThreePhasesRHSStrategy> phase_rhs_strategy =
+          std::dynamic_pointer_cast<ThreePhasesRHSStrategy>(
+              d_phase_rhs_strategy);
+      assert(phase_rhs_strategy);
+      phase_rhs_strategy->projectPhases(phi_id, corr_id, err_id);
+   }
+
    return 0;  // Always successful
 }
 
