@@ -77,29 +77,31 @@ c     local variables:
          do j = lo1, hi1
             do i = lo0, hi0
 
+c           Projection into plane sum_m phi_m=1
+c           consists in adding a correction in the direction (1,1,1)
                fac = 0.d0
                do m = 1, depth
-                  fac = fac + phi(i,j,k,m)**2
+                  fac = fac + phi(i,j,k,m)
                enddo
-               fac = 1.d0 / dsqrt(fac)
+               fac = (fac - 1.d0)/3.d0
 
-c              Store the q projection in the correction array for now
+c              Store the projection in the correction array for now
                do m = 1, depth
-                  corr(i,j,k,m) = phi(i,j,k,m) * fac
+                  corr(i,j,k,m) = phi(i,j,k,m) - fac
                enddo
 
-c              Compute the dot product of the error with the projected q
+c              Compute the dot product of the error with the projected phi
                fac = 0.d0
                do m = 1, depth
                   fac = fac + corr(i,j,k,m) * err(i,j,k,m)
                enddo
 
-c              Subtract the error component in the q direction
+c              Subtract the error component in the phi direction
                do m = 1, depth
                   err(i,j,k,m) = err(i,j,k,m) - corr(i,j,k,m) * fac
                enddo
 
-c              Finalize the correction: q + corr is on the constraint
+c              Finalize the correction: phi + corr is on the constraint
                do m = 1, depth
                   corr(i,j,k,m) = corr(i,j,k,m) - phi(i,j,k,m)
                enddo

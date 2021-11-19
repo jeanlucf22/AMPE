@@ -74,15 +74,17 @@ c     local variables:
       do j = lo1, hi1
          do i = lo0, hi0
 
+c           Projection into plane sum_m phi_m=1
+c           consists in adding a correction in the direction (1,1,1)
             fac = 0.d0
             do m = 1, depth
                fac = fac + phi(i,j,m)
             enddo
-            fac = 1.d0 / fac
+            fac = (fac - 1.d0)/3.d0
 
 c           Store the projection in the correction array for now
             do m = 1, depth
-               corr(i,j,m) = phi(i,j,m) * fac
+               corr(i,j,m) = phi(i,j,m) - fac
             enddo
 
 c           Compute the dot product of the error with the projected phi
