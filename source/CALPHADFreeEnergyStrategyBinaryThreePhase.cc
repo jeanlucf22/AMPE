@@ -56,6 +56,7 @@ CALPHADFreeEnergyStrategyBinaryThreePhase::
    // tbox::plog << "Molar volume L =" << vml << std::endl;
    // tbox::plog << "Molar volume A =" << vma << std::endl;
    // tbox::plog << "jpmol2pjpmumcube=" << d_jpmol2pjpmumcube << std::endl;
+   
    setup(calphad_db, newton_db);
 }
 

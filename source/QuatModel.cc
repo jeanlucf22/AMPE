@@ -346,12 +346,14 @@ void QuatModel::initializeRHSandEnergyStrategies(
              Tref, d_equilibrium_temperature_id);
       }
    }
+
    d_free_energy_strategy =
        FreeEnergyStrategyFactory::create(d_model_parameters, d_ncompositions,
                                          d_conc_l_scratch_id,
                                          d_conc_a_scratch_id,
                                          d_conc_b_scratch_id, d_mvstrategy,
                                          d_meltingT_strategy, Tref, d_conc_db);
+   
    if (d_model_parameters.with_concentration()) {
 
       d_free_energy_strategy_for_diffusion = d_free_energy_strategy;
@@ -370,7 +372,8 @@ void QuatModel::initializeRHSandEnergyStrategies(
                        << "Adding penalty to CALPHAD energy" << std::endl;
 
             assert(d_ncompositions == 1);
-            d_free_energy_strategy_for_diffusion.reset(
+   
+   	    d_free_energy_strategy_for_diffusion.reset(
                 new CALPHADFreeEnergyStrategyBinary(
                     calphad_db, newton_db,
                     d_model_parameters.energy_interp_func_type(),
@@ -403,6 +406,7 @@ void QuatModel::initializeRHSandEnergyStrategies(
                                                       d_ncompositions),
                                                   d_free_energy_strategy);
          }
+
          d_diffusion_for_conc_in_phase =
              CompositionDiffusionStrategyFactory::create(
                  this, d_model_parameters,
