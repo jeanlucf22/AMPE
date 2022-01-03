@@ -310,7 +310,6 @@ void QuatModel::initializeRHSandEnergyStrategies(
       d_conc_db = model_db->getDatabase("ConcentrationModel");
       if (d_conc_db->isDatabase("NewtonSolver")) {
                newton_db = d_conc_db->getDatabase("NewtonSolver");
-               newton_db->printClassData(std::cout);
       }
 
       if (d_model_parameters.isConcentrationModelCALPHAD() ||
@@ -347,14 +346,12 @@ void QuatModel::initializeRHSandEnergyStrategies(
              Tref, d_equilibrium_temperature_id);
       }
    }
-   std::cout << "before create..." << std::endl;
    d_free_energy_strategy =
        FreeEnergyStrategyFactory::create(d_model_parameters, d_ncompositions,
                                          d_conc_l_scratch_id,
                                          d_conc_a_scratch_id,
                                          d_conc_b_scratch_id, d_mvstrategy,
                                          d_meltingT_strategy, Tref, d_conc_db);
-   std::cout << "after create..." << std::endl;
    if (d_model_parameters.with_concentration()) {
 
       d_free_energy_strategy_for_diffusion = d_free_energy_strategy;
@@ -373,7 +370,6 @@ void QuatModel::initializeRHSandEnergyStrategies(
                        << "Adding penalty to CALPHAD energy" << std::endl;
 
             assert(d_ncompositions == 1);
-            std::cout << "before reset..." << std::endl;
             d_free_energy_strategy_for_diffusion.reset(
                 new CALPHADFreeEnergyStrategyBinary(
                     calphad_db, newton_db,
@@ -382,7 +378,6 @@ void QuatModel::initializeRHSandEnergyStrategies(
                     d_conc_l_scratch_id, d_conc_a_scratch_id,
                     d_conc_b_scratch_id,
                     d_model_parameters.with_third_phase()));
-	    std::cout << "after reset..." << std::endl;
          }
 #endif
       }
@@ -397,7 +392,6 @@ void QuatModel::initializeRHSandEnergyStrategies(
       mathops.copyData(d_conc_l_id, d_conc_id);
       mathops.copyData(d_conc_a_id, d_conc_id);
       if (d_conc_b_id > -1) mathops.copyData(d_conc_b_id, d_conc_id);
-      std::cout << "before CompositionStrategyMobilities" << std::endl;
       std::shared_ptr<tbox::Database> integrator_db =
           input_db->getDatabase("Integrator");
       if (d_model_parameters.concRHSstrategyIsEBS()) {
@@ -409,7 +403,6 @@ void QuatModel::initializeRHSandEnergyStrategies(
                                                       d_ncompositions),
                                                   d_free_energy_strategy);
          }
-         std::cout << "after CompositionStrategyMobilities" << std::endl;
          d_diffusion_for_conc_in_phase =
              CompositionDiffusionStrategyFactory::create(
                  this, d_model_parameters,

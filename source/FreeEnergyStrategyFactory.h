@@ -64,7 +64,6 @@ class FreeEnergyStrategyFactory
             }
             if (conc_db->isDatabase("NewtonSolver")) {
 	       newton_db = conc_db->getDatabase("NewtonSolver");
-	       newton_db->printClassData(std::cout);
             }
 
             if (ncompositions == 1) {
