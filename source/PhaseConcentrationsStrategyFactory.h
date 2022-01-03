@@ -27,7 +27,7 @@ class PhaseConcentrationsStrategyFactory
        int conc_a_scratch_id, int conc_b_scratch_id, int conc_l_ref_id,
        int conc_a_ref_id, int conc_b_ref_id, int partition_coeff_id,
        const int ncompositions, std::shared_ptr<tbox::Database> conc_db,
-       std::shared_ptr<tbox::MemoryDatabase> newton_db)
+       std::shared_ptr<tbox::Database> newton_db)
    {
       std::shared_ptr<tbox::MemoryDatabase> calphad_db;
       boost::property_tree::ptree calphad_pt;
@@ -53,6 +53,7 @@ class PhaseConcentrationsStrategyFactory
             if (ncompositions == 1) {
 #ifdef HAVE_THERMO4PFM
                if (conc_b_scratch_id >= 0) {
+		  std::cout << "before phase_conc_strategy.reset" << std::endl;      
                   phase_conc_strategy.reset(
                       new CALPHADequilibriumPhaseConcentrationsStrategy<
                           CALPHADFreeEnergyFunctionsBinary3Ph2Sl>(
@@ -63,6 +64,7 @@ class PhaseConcentrationsStrategyFactory
                           model_parameters.conc_interp_func_type(),
                           model_parameters.with_third_phase(), calphad_pt,
                           newton_db, ncompositions));
+		  std::cout << "after phase_conc_strategy.reset" << std::endl;
                } else
 #endif
                {
