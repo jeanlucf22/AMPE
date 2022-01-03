@@ -44,7 +44,7 @@ class FreeEnergyStrategyFactory
          if (model_parameters.isConcentrationModelCALPHAD()) {
             std::shared_ptr<tbox::MemoryDatabase> calphad_db;
             boost::property_tree::ptree calphad_pt;
-            std::shared_ptr<tbox::MemoryDatabase> newton_db;
+            std::shared_ptr<tbox::Database> newton_db;
 
             tbox::pout << "QuatModel: "
                        << "Using CALPHAD model for concentration" << std::endl;
@@ -63,8 +63,7 @@ class FreeEnergyStrategyFactory
                    calphad_filename, calphad_db);
             }
             if (conc_db->isDatabase("NewtonSolver")) {
-               db = conc_db->getDatabase("NewtonSolver");
-               newton_db.reset(new tbox::MemoryDatabase("newton_db"));
+	       newton_db = conc_db->getDatabase("NewtonSolver");
             }
 
             if (ncompositions == 1) {

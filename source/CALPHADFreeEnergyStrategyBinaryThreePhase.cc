@@ -56,7 +56,7 @@ CALPHADFreeEnergyStrategyBinaryThreePhase::
    // tbox::plog << "Molar volume L =" << vml << std::endl;
    // tbox::plog << "Molar volume A =" << vma << std::endl;
    // tbox::plog << "jpmol2pjpmumcube=" << d_jpmol2pjpmumcube << std::endl;
-
+   
    setup(calphad_db, newton_db);
 }
 
@@ -680,9 +680,9 @@ void CALPHADFreeEnergyStrategyBinaryThreePhase::addDrivingForceOnPatch(
             double t = ptr_temp[idx_temp];
             double mu = computeMuA(t, ca);
 double muL=computeMuL(t, cl);
-if(fabs(mu-muL)>1.e-5)
-std::cout<<"mu="<<mu<<", muL="<<muL<<std::endl;
-
+if(fabs(mu-muL)>1.e-5){
+    //std::cout<<"mu="<<mu<<", muL="<<muL<< ", phi_i=" << phi0 << " " << phi1 << " " << phi2 << " c_j=" << cl << " " << ca << " " << cb << std::endl;
+}
             ptr_rhs0[idx_rhs] += dg0dp0(phi0, phi1, phi2) * (fl - mu * cl) +
                                  dg0dp1(phi1, phi0, phi2) * (fa - mu * ca) +
                                  dg0dp1(phi2, phi0, phi1) * (fb - mu * cb);

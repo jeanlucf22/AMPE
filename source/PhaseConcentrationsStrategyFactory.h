@@ -27,7 +27,7 @@ class PhaseConcentrationsStrategyFactory
        int conc_a_scratch_id, int conc_b_scratch_id, int conc_l_ref_id,
        int conc_a_ref_id, int conc_b_ref_id, int partition_coeff_id,
        const int ncompositions, std::shared_ptr<tbox::Database> conc_db,
-       std::shared_ptr<tbox::MemoryDatabase> newton_db)
+       std::shared_ptr<tbox::Database> newton_db)
    {
       std::shared_ptr<tbox::MemoryDatabase> calphad_db;
       boost::property_tree::ptree calphad_pt;
